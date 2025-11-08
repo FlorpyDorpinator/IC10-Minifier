@@ -1,0 +1,30 @@
+[
+  {"op":"add", "display":"add rD, rS, rT|num", "parameters":["dest rD","src rS","rT|num"]},
+  {"op":"sub", "display":"sub rD, rS, rT|num", "parameters":["dest rD","src rS","rT|num"]},
+  {"op":"mul", "display":"mul rD, rS, rT|num", "parameters":["dest rD","src rS","rT|num"]},
+  {"op":"div", "display":"div rD, rS, rT|num", "parameters":["dest rD","src rS","rT|num"]},
+  {"op":"mod", "display":"mod rD, rS, rT|num", "parameters":["dest rD","src rS","rT|num"]},
+
+  {"op":"mov", "display":"mov rD, rS|num", "parameters":["dest rD","src rS|num"]},
+  {"op":"li",  "display":"li rD, num", "parameters":["dest rD","num"]},
+
+  {"op":"beq", "display":"beq rS, rT|num, label", "parameters":["rS","rT|num","label"]},
+  {"op":"bne", "display":"bne rS, rT|num, label", "parameters":["rS","rT|num","label"]},
+  {"op":"beqz","display":"beqz rS, label", "parameters":["rS","label"]},
+  {"op":"bnez","display":"bnez rS, label", "parameters":["rS","label"]},
+  {"op":"blt", "display":"blt rS, rT|num, label", "parameters":["rS","rT|num","label"]},
+  {"op":"ble", "display":"ble rS, rT|num, label", "parameters":["rS","rT|num","label"]},
+  {"op":"bgt", "display":"bgt rS, rT|num, label", "parameters":["rS","rT|num","label"]},
+  {"op":"bge", "display":"bge rS, rT|num, label", "parameters":["rS","rT|num","label"]},
+  {"op":"j",   "display":"j label", "parameters":["label"]},
+  {"op":"jal", "display":"jal label", "parameters":["label"]},
+
+  {"op":"l",   "display":"l rD, HASH(\"Device\"), Slot", "parameters":["dest rD","Device","Slot"]},
+  {"op":"s",   "display":"s HASH(\"Device\"), Slot, rS|num", "parameters":["Device","Slot","src rS|num"]},
+  {"op":"lb",  "display":"lb rD, HASH(\"Device\"), Field", "parameters":["dest rD","Device","Field"]},
+  {"op":"lbn", "display":"lbn rD, HASH(\"Device\"), Field", "parameters":["dest rD","Device","Field"]},
+  {"op":"sb",  "display":"sb HASH(\"Device\"), Field, rS|num", "parameters":["Device","Field","src rS|num"]},
+  {"op":"sbn", "display":"sbn HASH(\"Device\"), Field, rS|num", "parameters":["Device","Field","src rS|num"]},
+  {"op":"get", "display":"get rD, HASH(\"Device\"), Setting", "parameters":["dest rD","Device","Setting"]},
+  {"op":"put", "display":"put HASH(\"Device\"), Setting, rS|num", "parameters":["Device","Setting","src rS|num"]}
+]
