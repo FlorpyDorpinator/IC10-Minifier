@@ -2,7 +2,7 @@
   "name": "ic10-safe-minifier",
   "displayName": "IC10 Safe Minifier",
   "description": "Safely minifies Stationeers IC10 code: removes indentation/blank lines, replaces aliases/defines, collapses spaces, preserves HASH(...) directives.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "FlorpyDorp",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
