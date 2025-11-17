@@ -45,7 +45,7 @@ function collectLabels(lines){
 }
 
 function collectLabelRefs(lines,labelSet){
-  const refs=new Set(); const branchOps=new Set(['j','jal','beq','bne','beqz','bnez','blt','ble','bgt','bge']);
+  const refs=new Set(); const branchOps=new Set(['j','jr','jal','beq','bne','blt','bgt','ble','bge','beqz','bnez','bltz','bgez','blez','bgtz','bdse','bdns','bap','bna','bapz','bnaz','beqal','bneal','bltzal','bgezal','blezal','bgtzal','bltal','bgtal','bleal','bgeal','beqzal','bnezal','bapzal','bnazal','bapal','bnaal','bdseal','bdnsal','breq','brne','brlt','brgt','brle','brge','breqz','brnez','brltz','brgez','brlez','brgtz','brdse','brdns','brap','brna','brapz','brnaz']);
   for(let idx=0; idx<lines.length; idx++){
     const raw=lines[idx]; const parts=splitQuotedSegments(raw);
     let code=parts.filter(p=>!p.quoted).map(p=>p.text).join(' ');
