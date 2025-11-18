@@ -2,6 +2,12 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.0.4] - 2025-11-17
+
+### Fixed
+- Fixed keybinding activation: Added missing `activationEvents` to ensure extension loads and keybindings are registered when VS Code starts
+- Added language definition for `.ic10` files to properly register the file type with VS Code
+
 ## [1.0.3] - 2025-11-17
 
 ### Fixed

@@ -2,7 +2,7 @@
   "name": "ic10-safe-minifier",
   "displayName": "IC10 Safe Minifier",
   "description": "Safely minifies Stationeers IC10 code: removes indentation/blank lines, replaces aliases/defines, collapses spaces, preserves HASH(...) directives.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "FlorpyDorp",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
@@ -18,14 +18,25 @@
     "url": "https://github.com/FlorpyDorpinator/IC10-Minifier/issues"
   },
   "homepage": "https://github.com/FlorpyDorpinator/IC10-Minifier#readme",
+  "activationEvents": [
+    "onCommand:ic10SafeMinifier.minify",
+    "onCommand:ic10SafeMinifier.preview"
+  ],
   "contributes": {
+    "languages": [
+      {
+        "id": "ic10",
+        "extensions": [".ic10"],
+        "aliases": ["IC10", "ic10"]
+      }
+    ],
     "commands": [
       { "command": "ic10SafeMinifier.minify", "title": "IC10: Safe Minify current file" },
       { "command": "ic10SafeMinifier.preview", "title": "IC10: Preview Minified (no save)" }
     ],
     "keybindings": [
-      { "command": "ic10SafeMinifier.minify", "key": "ctrl+alt+m", "when": "editorTextFocus && resourceExtname == '.ic10'" },
-      { "command": "ic10SafeMinifier.preview", "key": "ctrl+alt+p", "when": "editorTextFocus && resourceExtname == '.ic10'" }
+      { "command": "ic10SafeMinifier.minify", "key": "ctrl+alt+m" },
+      { "command": "ic10SafeMinifier.preview", "key": "ctrl+alt+p" }
     ],
     "configuration": {
       "type": "object",
