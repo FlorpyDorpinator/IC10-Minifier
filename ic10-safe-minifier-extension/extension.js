@@ -22,7 +22,7 @@ function parseDefinesAliases(lines){
   for(let idx=0; idx<lines.length; idx++){
     const line=lines[idx].trim();
     if(!line){ keepLine[idx]=false; continue; }
-    let m=line.match(/^define\s+([A-Za-z_][\w$]*)\s+(.+)$/);
+    let m=line.match(/^define\s+([A-Za-z_][\w$]*)\s+(.+?)(?:\s*#.*)?$/);
     if(m){
       const name=m[1]; const value=m[2].trim();
       if(/^(?:-?\d+(?:\.\d+)?|HASH\(\".*\"\)|\$[0-9A-Fa-f]+)$/.test(value)){
@@ -30,7 +30,7 @@ function parseDefinesAliases(lines){
       }
       continue;
     }
-    m=line.match(/^alias\s+([A-Za-z_][\w$]*)\s+(r(?:[0-9]|1[0-5]))$/);
+    m=line.match(/^alias\s+([A-Za-z_][\w$]*)\s+(r(?:[0-9]|1[0-5]))(?:\s|#|$)/);
     if(m){ aliases.set(m[1],m[2]); keepLine[idx]=false; continue; }
   }
   return {defines,aliases,keepLine};

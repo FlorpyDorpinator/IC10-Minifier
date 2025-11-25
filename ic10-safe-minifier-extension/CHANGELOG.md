@@ -2,6 +2,13 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.0.5] - 2025-11-24
+
+### Fixed
+- Fixed alias parsing: Now correctly removes alias definitions that have inline comments
+- Fixed keybindings: Changed minify hotkey from Ctrl+Alt+M to Ctrl+Alt+Y to avoid conflicts
+- Changed activation event to `onStartupFinished` for better performance
+
 ## [1.0.4] - 2025-11-17
 
 ### Fixed

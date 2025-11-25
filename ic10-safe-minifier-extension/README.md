@@ -7,7 +7,8 @@ Command: IC10: Safe Minify current file
 ## Use
 - Open an `.ic10` file
 - Press `Ctrl+Shift+P` → `IC10: Safe Minify current file`
-- Or press `Ctrl+Alt+M`
+- Or press `Ctrl+Alt+Y` to minify
+- Or press `Ctrl+Alt+P` to preview without saving
 
 ## Develop
 - Press `F5` in VS Code to start an Extension Development Host and test the command.

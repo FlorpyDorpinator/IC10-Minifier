@@ -2,7 +2,7 @@
   "name": "ic10-safe-minifier",
   "displayName": "IC10 Safe Minifier",
   "description": "Safely minifies Stationeers IC10 code: removes indentation/blank lines, replaces aliases/defines, collapses spaces, preserves HASH(...) directives.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "FlorpyDorp",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
@@ -19,8 +19,7 @@
   },
   "homepage": "https://github.com/FlorpyDorpinator/IC10-Minifier#readme",
   "activationEvents": [
-    "onCommand:ic10SafeMinifier.minify",
-    "onCommand:ic10SafeMinifier.preview"
+    "onStartupFinished"
   ],
   "contributes": {
     "languages": [
@@ -35,7 +34,7 @@
       { "command": "ic10SafeMinifier.preview", "title": "IC10: Preview Minified (no save)" }
     ],
     "keybindings": [
-      { "command": "ic10SafeMinifier.minify", "key": "ctrl+alt+m" },
+      { "command": "ic10SafeMinifier.minify", "key": "ctrl+alt+y" },
       { "command": "ic10SafeMinifier.preview", "key": "ctrl+alt+p" }
     ],
     "configuration": {
