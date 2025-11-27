@@ -2,6 +2,11 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.0.7] - 2025-11-27
+
+### Fixed
+- Fixed inline comment removal on lines with HASH() or STR() functions - now properly strips comments like `# Use space if empty` even when the line contains function calls
+
 ## [1.0.6] - 2025-11-26
 
 ### Fixed

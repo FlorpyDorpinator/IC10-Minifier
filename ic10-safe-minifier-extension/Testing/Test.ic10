@@ -59,7 +59,7 @@ StartSpiralScan:
     bge VerticalAngleValue 90 ResetDishForDown
     bgeal HorizontalAngleValue TempStore StartSpiralScan
     j Scan
-
+move r12 STR(" ") # Use space if empty
 StartSpiralScanDown:
     ResetDishForDown:
         move VerticalAngleValue 90

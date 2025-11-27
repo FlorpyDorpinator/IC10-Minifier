@@ -85,20 +85,18 @@ function minifyContent(src, options){
     if(!line.trim()) continue;
     let replaced=applyReplacements(line,aliases,defines).trimEnd();
     if(stripComments){
-      const leadingTrim=replaced.trimStart();
-      // Check if line contains actual HASH() or similar function calls with quotes
-      const hasHashFunction=/\b(?:HASH|STR)\s*\(/.test(leadingTrim);
-      if(!hasHashFunction){
-        const parts=splitQuotedSegments(replaced); let newText=''; let commentFound=false;
-        for(const seg of parts){
-          if(seg.quoted){ newText+=seg.text; continue; }
-          if(commentFound) continue;
-          const hashIdx=seg.text.indexOf('#');
-          if(hashIdx>=0){ newText+=seg.text.slice(0,hashIdx); commentFound=true; continue; }
-          newText+=seg.text;
-        }
-        replaced=newText.trimEnd();
+      // Always strip inline comments, even on lines with HASH() or STR()
+      const parts=splitQuotedSegments(replaced); let newText=''; let commentFound=false;
+      for(const seg of parts){
+        if(seg.quoted){ newText+=seg.text; continue; }
+        if(commentFound) continue;
+        const hashIdx=seg.text.indexOf('#');
+        if(hashIdx>=0){ newText+=seg.text.slice(0,hashIdx); commentFound=true; continue; }
+        newText+=seg.text;
       }
+      replaced=newText.trimEnd();
+      // Check if line contains actual HASH() or similar function calls with quotes
+      const hasHashFunction=/\b(?:HASH|STR)\s*\(/.test(replaced);
       // Remove comment-only lines (starting with #) unless they contain HASH(
       if(/^\s*#/.test(replaced) && !hasHashFunction) continue;
     }
