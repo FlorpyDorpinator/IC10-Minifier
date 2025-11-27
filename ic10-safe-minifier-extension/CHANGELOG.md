@@ -2,6 +2,12 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.0.6] - 2025-11-26
+
+### Fixed
+- Fixed comment removal: Now correctly removes quoted string comments (e.g., `"yummy cheese"`) that don't contain actual function calls like HASH() or STR()
+- Improved logic to only preserve lines with actual HASH() or STR() function calls, not just any line with quotes
+
 ## [1.0.5] - 2025-11-24
 
 ### Fixed

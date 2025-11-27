@@ -117,7 +117,7 @@ SetTrueTraderLocation:
     get r12 db 12
     breqz r12 -2
     j ResetDish
-
+# I love to eat "yummy cheese" 
     
 UpdateCurrentStrongestSignal:
     yield

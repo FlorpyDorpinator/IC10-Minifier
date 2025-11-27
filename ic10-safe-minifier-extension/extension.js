@@ -86,7 +86,9 @@ function minifyContent(src, options){
     let replaced=applyReplacements(line,aliases,defines).trimEnd();
     if(stripComments){
       const leadingTrim=replaced.trimStart();
-      if(!leadingTrim.startsWith('HASH(')){
+      // Check if line contains actual HASH() or similar function calls with quotes
+      const hasHashFunction=/\b(?:HASH|STR)\s*\(/.test(leadingTrim);
+      if(!hasHashFunction){
         const parts=splitQuotedSegments(replaced); let newText=''; let commentFound=false;
         for(const seg of parts){
           if(seg.quoted){ newText+=seg.text; continue; }
@@ -97,11 +99,14 @@ function minifyContent(src, options){
         }
         replaced=newText.trimEnd();
       }
-      if(/^\s*#/.test(replaced) && !/^\s*HASH\(/.test(replaced)) continue;
+      // Remove comment-only lines (starting with #) unless they contain HASH(
+      if(/^\s*#/.test(replaced) && !hasHashFunction) continue;
     }
     replaced = replaced.replace(/^\s+/, '');
     const segmentParts=splitQuotedSegments(replaced).map(p=> p.quoted ? p.text : p.text.replace(/\s{2,}/g,' ') );
     replaced=segmentParts.join('').replace(/\s+$/,'');
+    // Skip lines that are just quoted strings (comments disguised as strings)
+    if(/^"[^"]*"$/.test(replaced.trim())) continue;
     if(replaced.trim().length===0) continue;
     outLines.push(replaced);
   }
