@@ -154,7 +154,12 @@ function activate(context){
     const previewDoc = await vscode.workspace.openTextDocument(untitledUri);
     const shown = await vscode.window.showTextDocument(previewDoc, { preview: true });
     await shown.edit(edit => {
-      edit.insert(new vscode.Position(0, 0), outText);
+      // Replace all content instead of inserting
+      const fullRange = new vscode.Range(
+        previewDoc.positionAt(0),
+        previewDoc.positionAt(previewDoc.getText().length)
+      );
+      edit.replace(fullRange, outText);
     });
     // Try to preserve the language of the source file for better syntax highlighting
     try { await vscode.languages.setTextDocumentLanguage(previewDoc, doc.languageId || 'plaintext'); } catch {}

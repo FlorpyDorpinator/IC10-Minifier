@@ -2,6 +2,11 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.0.8] - 2025-12-05
+
+### Fixed
+- Fixed preview command: Now replaces all content in temp file instead of appending when the temp file is already open
+
 ## [1.0.7] - 2025-11-27
 
 ### Fixed
