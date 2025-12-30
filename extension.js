@@ -111,6 +111,63 @@ function minifyContent(src, options){
   return outLines.join('\n');
 }
 
+function convertLabelsToLineNumbers(src){
+  const origLines=src.split(/\r?\n/);
+  // First pass: build label map (label name -> VS Code line number)
+  const labelMap=new Map();
+  for(let i=0; i<origLines.length; i++){
+    const t=origLines[i].trim();
+    if(!t) continue;
+    const m=t.match(/^([A-Za-z_][\w$]*):\s*$/);
+    if(m){ labelMap.set(m[1], i); }
+  }
+  
+  // Branch operations that can reference labels
+  const branchOps=new Set(['j','jr','jal','beq','bne','blt','bgt','ble','bge','beqz','bnez','bltz','bgez','blez','bgtz','bdse','bdns','bap','bna','bapz','bnaz','beqal','bneal','bltzal','bgezal','blezal','bgtzal','bltal','bgtal','bleal','bgeal','beqzal','bnezal','bapzal','bnazal','bapal','bnaal','bdseal','bdnsal','breq','brne','brlt','brgt','brle','brge','breqz','brnez','brltz','brgez','brlez','brgtz','brdse','brdns','brap','brna','brapz','brnaz']);
+  
+  const outLines=[];
+  for(let i=0; i<origLines.length; i++){
+    let line=origLines[i];
+    const trimmed=line.trim();
+    
+    // Skip label definition lines
+    if(/^[A-Za-z_][\w$]*:\s*$/.test(trimmed)) continue;
+    
+    // Replace label references with line numbers
+    const parts=splitQuotedSegments(line);
+    for(const part of parts){
+      if(part.quoted) continue;
+      
+      // Split into tokens to find branch instructions
+      let code=part.text.replace(/#.*$/,''); // Remove comments for parsing
+      const tokens=code.split(/\s+/).filter(Boolean);
+      if(tokens.length===0) continue;
+      
+      // Check if first token (or second if first is a label) is a branch op
+      let opIdx=0;
+      if(/^[A-Za-z_][\w$]*:$/.test(tokens[0])) opIdx=1;
+      if(opIdx>=tokens.length) continue;
+      
+      const op=tokens[opIdx];
+      if(!branchOps.has(op)) continue;
+      
+      // Last token might be a label reference
+      const lastToken=tokens[tokens.length-1];
+      if(/^[A-Za-z_][\w$]*$/.test(lastToken) && labelMap.has(lastToken)){
+        // Convert VS Code line number (1-based) to IC10 line number (0-based)
+        const ic10LineNum=labelMap.get(lastToken); // VS Code line is already 0-based from array index
+        const rx=new RegExp(`\\b${escapeRegExp(lastToken)}\\b`);
+        part.text=part.text.replace(rx, String(ic10LineNum));
+      }
+    }
+    
+    line=parts.map(p=>p.text).join('');
+    outLines.push(line);
+  }
+  
+  return outLines.join('\n');
+}
+
 function activate(context){
   const disposable = vscode.commands.registerCommand('ic10SafeMinifier.minify', async () => {
     const editor = vscode.window.activeTextEditor;
@@ -165,6 +222,28 @@ function activate(context){
     try { await vscode.languages.setTextDocumentLanguage(previewDoc, doc.languageId || 'plaintext'); } catch {}
   });
   context.subscriptions.push(previewCmd);
+
+  const convertLabelsCmd = vscode.commands.registerCommand('ic10SafeMinifier.convertLabels', async () => {
+    const editor = vscode.window.activeTextEditor;
+    if(!editor){ vscode.window.showErrorMessage('No active editor'); return; }
+    const doc = editor.document;
+    const text = doc.getText();
+    const outText = convertLabelsToLineNumbers(text);
+    const fsPath = doc.uri.fsPath;
+    const base = path.basename(fsPath);
+    const ext = path.extname(base) || '.ic10';
+    const nameNoExt = base.endsWith(ext) ? base.slice(0, -ext.length) : base;
+    const outPath = path.join(path.dirname(fsPath), `${nameNoExt} ABSOLUTE${ext}`);
+    try{
+      await vscode.workspace.fs.writeFile(vscode.Uri.file(outPath), Buffer.from(outText, 'utf8'));
+      vscode.window.showInformationMessage('IC10 labels converted to line numbers → ' + path.basename(outPath));
+      const newDoc = await vscode.workspace.openTextDocument(vscode.Uri.file(outPath));
+      await vscode.window.showTextDocument(newDoc, { preview: false });
+    }catch(err){
+      vscode.window.showErrorMessage('Label conversion failed: ' + (err && err.message ? err.message : String(err)));
+    }
+  });
+  context.subscriptions.push(convertLabelsCmd);
 }
 
 function deactivate(){}

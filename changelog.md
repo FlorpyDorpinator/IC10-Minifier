@@ -2,6 +2,13 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.0.9] - 2025-12-30
+
+### Added
+- New command: "IC10: Convert Labels to Line Numbers" - Converts all label references to absolute line numbers (IC10 0-based) and removes label definitions
+- New keybinding: Ctrl+Alt+J for label-to-line-number conversion
+- Creates a new file with " ABSOLUTE" suffix containing the converted code
+
 ## [1.0.8] - 2025-12-05
 
 ### Fixed

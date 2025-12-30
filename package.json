@@ -2,7 +2,7 @@
   "name": "ic10-safe-minifier",
   "displayName": "IC10 Safe Minifier",
   "description": "Safely minifies Stationeers IC10 code: removes indentation/blank lines, replaces aliases/defines, collapses spaces, preserves HASH(...) directives.",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "publisher": "FlorpyDorp",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
@@ -31,11 +31,13 @@
     ],
     "commands": [
       { "command": "ic10SafeMinifier.minify", "title": "IC10: Safe Minify current file" },
-      { "command": "ic10SafeMinifier.preview", "title": "IC10: Preview Minified (no save)" }
+      { "command": "ic10SafeMinifier.preview", "title": "IC10: Preview Minified (no save)" },
+      { "command": "ic10SafeMinifier.convertLabels", "title": "IC10: Convert Labels to Line Numbers" }
     ],
     "keybindings": [
       { "command": "ic10SafeMinifier.minify", "key": "ctrl+alt+y" },
-      { "command": "ic10SafeMinifier.preview", "key": "ctrl+alt+p" }
+      { "command": "ic10SafeMinifier.preview", "key": "ctrl+alt+p" },
+      { "command": "ic10SafeMinifier.convertLabels", "key": "ctrl+alt+j" }
     ],
     "configuration": {
       "type": "object",
