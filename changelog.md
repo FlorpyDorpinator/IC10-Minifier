@@ -2,6 +2,11 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.1.0] - 2026-01-03
+
+### Fixed (CRITICAL)
+- **CRITICAL BUG FIX**: Fixed absolute line jump calculation in "Convert Labels to Line Numbers" feature. Previously, line numbers were calculated based on original positions before label definitions were removed, causing incorrect jump targets. Now properly calculates final output line positions after all label definitions are stripped, ensuring accurate IC10 0-based line numbers.
+
 ## [1.0.9] - 2025-12-30
 
 ### Added

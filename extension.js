@@ -113,25 +113,56 @@ function minifyContent(src, options){
 
 function convertLabelsToLineNumbers(src){
   const origLines=src.split(/\r?\n/);
-  // First pass: build label map (label name -> VS Code line number)
-  const labelMap=new Map();
+  
+  // First pass: identify label definitions and build original label map
+  const labelDefinitionLines=new Set();
+  const labelOriginalLineMap=new Map(); // label name -> original line index
   for(let i=0; i<origLines.length; i++){
     const t=origLines[i].trim();
     if(!t) continue;
     const m=t.match(/^([A-Za-z_][\w$]*):\s*$/);
-    if(m){ labelMap.set(m[1], i); }
+    if(m){ 
+      labelDefinitionLines.add(i);
+      labelOriginalLineMap.set(m[1], i); 
+    }
+  }
+  
+  // Second pass: build output line mapping (original line index -> output line index)
+  const originalToOutputLineMap=new Map();
+  let outputLineNum=0;
+  for(let i=0; i<origLines.length; i++){
+    if(labelDefinitionLines.has(i)){
+      // Label definition line will be removed, but any label on next line gets this position
+      continue;
+    }
+    originalToOutputLineMap.set(i, outputLineNum);
+    outputLineNum++;
+  }
+  
+  // Build final label map: label name -> output line number (IC10 0-based)
+  const labelFinalLineMap=new Map();
+  for(const [labelName, origLine] of labelOriginalLineMap.entries()){
+    // Find the next non-label line after this label definition
+    let targetLine=origLine+1;
+    while(targetLine<origLines.length && labelDefinitionLines.has(targetLine)){
+      targetLine++;
+    }
+    if(targetLine<origLines.length && originalToOutputLineMap.has(targetLine)){
+      labelFinalLineMap.set(labelName, originalToOutputLineMap.get(targetLine));
+    }
   }
   
   // Branch operations that can reference labels
   const branchOps=new Set(['j','jr','jal','beq','bne','blt','bgt','ble','bge','beqz','bnez','bltz','bgez','blez','bgtz','bdse','bdns','bap','bna','bapz','bnaz','beqal','bneal','bltzal','bgezal','blezal','bgtzal','bltal','bgtal','bleal','bgeal','beqzal','bnezal','bapzal','bnazal','bapal','bnaal','bdseal','bdnsal','breq','brne','brlt','brgt','brle','brge','breqz','brnez','brltz','brgez','brlez','brgtz','brdse','brdns','brap','brna','brapz','brnaz']);
   
+  // Third pass: build output, replacing label references
   const outLines=[];
   for(let i=0; i<origLines.length; i++){
     let line=origLines[i];
     const trimmed=line.trim();
     
     // Skip label definition lines
-    if(/^[A-Za-z_][\w$]*:\s*$/.test(trimmed)) continue;
+    if(labelDefinitionLines.has(i)) continue;
     
     // Replace label references with line numbers
     const parts=splitQuotedSegments(line);
@@ -153,9 +184,9 @@ function convertLabelsToLineNumbers(src){
       
       // Last token might be a label reference
       const lastToken=tokens[tokens.length-1];
-      if(/^[A-Za-z_][\w$]*$/.test(lastToken) && labelMap.has(lastToken)){
-        // Convert VS Code line number (1-based) to IC10 line number (0-based)
-        const ic10LineNum=labelMap.get(lastToken); // VS Code line is already 0-based from array index
+      if(/^[A-Za-z_][\w$]*$/.test(lastToken) && labelFinalLineMap.has(lastToken)){
+        // Use the final output line number (IC10 0-based)
+        const ic10LineNum=labelFinalLineMap.get(lastToken);
         const rx=new RegExp(`\\b${escapeRegExp(lastToken)}\\b`);
         part.text=part.text.replace(rx, String(ic10LineNum));
       }

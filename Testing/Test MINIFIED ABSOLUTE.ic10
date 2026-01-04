@@ -1,0 +1,112 @@
+lbn r14 HASH("2037291645") HASH("TrinityAngleSolver") ReferenceId 1
+put db 100 r14
+define AngleSolver r14
+lbn r14 HASH("2037291645") HASH("TrinityPolynomial") ReferenceId 1
+define PolynomialSolver r14
+lbn r14 HASH("2037291645") HASH("TrinityOne") ReferenceId 1
+define TrinityOne r14
+move r1 2
+sb HASH("StructureLogicDial") Mode 2
+lb r10 HASH("StructureSatelliteDish") ReferenceId Minimum
+lb r11 HASH("StructureLargeSatelliteDish") ReferenceId Minimum
+s r10 BestContactFilter -1
+s r10 Horizontal 0
+s r10 Vertical 0
+s r10 Setting 500
+s r10 BestContactFilter -1
+move r5 0
+move r3 0
+move r4 0
+jal 90
+lb r0 HASH("StructureLogicButton") Activate Maximum
+beq r0 0 20
+add r3 r3 90
+add r4 r4 6.875
+s r10 Horizontal r3
+s r10 Vertical r4
+jal 83
+beq r2 r1 48
+l r0 r10 Horizontal
+bge r4 90 33
+bgeal r3 r0 22
+j 24
+move r12 STR(" ")
+move r4 90
+move r3 100
+s r10 Vertical r4
+s r10 Horizontal r3
+jal 90
+sub r4 r4 6.875
+sub r3 r3 90
+s r10 Horizontal r3
+s r10 Vertical r4
+jal 83
+beq r2 r1 48
+l r0 r10 Horizontal
+ble r4 0 12
+bleal r3 r0 38
+j 40
+s r10 Setting 7500
+add r3 r3 1
+s r10 Horizontal r3
+jal 90
+sleep 20
+l r12 r10 WattsReachingContact
+beq r12 -1 96
+jal 101
+add r3 3 r3
+sub r4 r4 2
+s r10 Horizontal r3
+s r10 Vertical r4
+jal 90
+sleep 20
+jal 101
+add r4 r4 6
+sub r3 r3 6
+s r10 Horizontal r3
+s r10 Vertical r4
+jal 90
+sleep 20
+jal 101
+put db 12 0
+get r12 db 12
+beqz r12 71
+get r6 db 43
+get r7 db 44
+s r10 Horizontal r6
+s r10 Vertical r7
+j 90
+put db 12 0
+yield
+get r12 db 12
+breqz r12 -2
+j 12
+yield
+put r10 0 TraderInstruction.WriteTraderData
+get r2 r10 1
+put db 1 r2
+srl r2 r2 16
+and r2 $FF r2
+j ra
+yield
+l r11 r10 Idle
+beqz r11 90
+j ra
+lb r1 HASH("StructureLogicDial") Setting Minimum
+j ra
+add r3 5 r3
+add r4 1 r4
+s r10 Horizontal r3
+s r10 Vertical r4
+j 48
+l r13 r10 WattsReachingContact
+lbn r14 2037291645 HASH("TrinityAngleSolver") ReferenceId 1
+put r14 1 r13
+put r14 12 1
+l r13 r10 Vertical
+lbn r14 2037291645 HASH("TrinityPolynomial") ReferenceId 1
+put r14 0 r13
+l r13 r10 Horizontal
+put r14 5 r13
+put r14 12 1
+j ra
