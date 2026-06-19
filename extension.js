@@ -45,16 +45,22 @@ function collectLabels(lines){
 }
 
 function collectLabelRefs(lines,labelSet){
-  const refs=new Set(); const branchOps=new Set(['j','jr','jal','beq','bne','blt','bgt','ble','bge','beqz','bnez','bltz','bgez','blez','bgtz','bdse','bdns','bap','bna','bapz','bnaz','beqal','bneal','bltzal','bgezal','blezal','bgtzal','bltal','bgtal','bleal','bgeal','beqzal','bnezal','bapzal','bnazal','bapal','bnaal','bdseal','bdnsal','breq','brne','brlt','brgt','brle','brge','breqz','brnez','brltz','brgez','brlez','brgtz','brdse','brdns','brap','brna','brapz','brnaz']);
+  // A label name is a line-number constant in IC10 and can appear as an operand of
+  // ANY instruction (e.g. `move coolingState waitForHot`), not just branch ops.
+  // Treat every operand token that matches a known label name as a reference.
+  const refs=new Set();
   for(let idx=0; idx<lines.length; idx++){
     const raw=lines[idx]; const parts=splitQuotedSegments(raw);
     let code=parts.filter(p=>!p.quoted).map(p=>p.text).join(' ');
     code=code.replace(/#.*$/,'');
     const tokens=code.split(/\s+/).filter(Boolean); if(tokens.length===0) continue;
-    if(/^[A-Za-z_][\w$]*:$/.test(tokens[0])) tokens.shift(); if(tokens.length===0) continue;
-    const op=tokens[0]; if(!branchOps.has(op)) continue;
-    const cand=tokens[tokens.length-1];
-    if(cand && /^[A-Za-z_][\w$]*$/.test(cand) && labelSet.has(cand)) refs.add(cand);
+    // Skip a leading label-definition token (e.g. "loop:") and the opcode itself.
+    let start=0;
+    if(/^[A-Za-z_][\w$]*:$/.test(tokens[0])) start=1;
+    for(let t=start+1; t<tokens.length; t++){
+      const tok=tokens[t];
+      if(/^[A-Za-z_][\w$]*$/.test(tok) && labelSet.has(tok)) refs.add(tok);
+    }
   }
   return refs;
 }
@@ -152,46 +158,37 @@ function convertLabelsToLineNumbers(src){
     }
   }
   
-  // Branch operations that can reference labels
-  const branchOps=new Set(['j','jr','jal','beq','bne','blt','bgt','ble','bge','beqz','bnez','bltz','bgez','blez','bgtz','bdse','bdns','bap','bna','bapz','bnaz','beqal','bneal','bltzal','bgezal','blezal','bgtzal','bltal','bgtal','bleal','bgeal','beqzal','bnezal','bapzal','bnazal','bapal','bnaal','bdseal','bdnsal','breq','brne','brlt','brgt','brle','brge','breqz','brnez','brltz','brgez','brlez','brgtz','brdse','brdns','brap','brna','brapz','brnaz']);
-  
-  // Third pass: build output, replacing label references
+  // Third pass: build output, replacing label references.
+  // Labels are line-number constants and can appear as operands of ANY instruction
+  // (e.g. `move coolingState waitForHot`), not just branch ops.
   const outLines=[];
   for(let i=0; i<origLines.length; i++){
     let line=origLines[i];
-    const trimmed=line.trim();
-    
+
     // Skip label definition lines
     if(labelDefinitionLines.has(i)) continue;
-    
+
     // Replace label references with line numbers
     const parts=splitQuotedSegments(line);
     for(const part of parts){
       if(part.quoted) continue;
-      
-      // Split into tokens to find branch instructions
+
+      // Split into tokens, skipping any leading label-definition token and the opcode.
       let code=part.text.replace(/#.*$/,''); // Remove comments for parsing
       const tokens=code.split(/\s+/).filter(Boolean);
       if(tokens.length===0) continue;
-      
-      // Check if first token (or second if first is a label) is a branch op
       let opIdx=0;
       if(/^[A-Za-z_][\w$]*:$/.test(tokens[0])) opIdx=1;
-      if(opIdx>=tokens.length) continue;
-      
-      const op=tokens[opIdx];
-      if(!branchOps.has(op)) continue;
-      
-      // Last token might be a label reference
-      const lastToken=tokens[tokens.length-1];
-      if(/^[A-Za-z_][\w$]*$/.test(lastToken) && labelFinalLineMap.has(lastToken)){
-        // Use the final output line number (IC10 0-based)
-        const ic10LineNum=labelFinalLineMap.get(lastToken);
-        const rx=new RegExp(`\\b${escapeRegExp(lastToken)}\\b`);
-        part.text=part.text.replace(rx, String(ic10LineNum));
+
+      for(let t=opIdx+1; t<tokens.length; t++){
+        const tok=tokens[t];
+        if(/^[A-Za-z_][\w$]*$/.test(tok) && labelFinalLineMap.has(tok)){
+          const ic10LineNum=labelFinalLineMap.get(tok);
+          part.text=part.text.replace(new RegExp(`\\b${escapeRegExp(tok)}\\b`,'g'), String(ic10LineNum));
+        }
       }
     }
-    
+
     line=parts.map(p=>p.text).join('');
     outLines.push(line);
   }

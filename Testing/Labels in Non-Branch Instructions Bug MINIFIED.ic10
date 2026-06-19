@@ -1,0 +1,114 @@
+alias habGrowlight d0
+alias solidGen d1
+alias mainBattery d2
+alias coolingAnalyzer d3
+alias habSensor d4
+alias coolingVent d5
+move r15 0
+lbn r14 HASH("StructureDaylightSensor") HASH("surface_sensor") Activate Sum
+move r13 -1
+put db 5 4700
+put db 4 4701
+put db 3 4702
+put db 2 11024
+move r12 waitForHot
+tickStart:
+yield
+lbn r1 HASH("StructureDaylightSensor") HASH("surface_sensor") Activate Sum
+seq r0 r14 r1
+move r14 r1
+mul r15 r15 r0
+select r0 r1 1 -1
+add r15 r15 r0
+s db Setting r15
+add r13 r13 1
+slt r0 r13 2400
+mul r13 r13 r0
+slt r0 r13 1900
+s habGrowlight On r0
+lbn r0 HASH("StructureDaylightSensor") HASH("surface_sensor") Horizontal Sum
+sub r0 r0 90
+sb HASH("StructureSolarPanelDual") Horizontal r0
+lbn r0 HASH("StructureDaylightSensor") HASH("surface_sensor") Vertical Sum
+sub r0 90 r0
+sb HASH("StructureSolarPanelDual") Vertical r0
+l r0 mainBattery Ratio
+brgt r0 0.2 2
+s solidGen On 1
+brlt r0 0.5 2
+s solidGen On 0
+lbn r0 HASH("StructureLiquidPipeAnalyzer") HASH("purifier_analyzer") VolumeOfLiquid Sum
+sgt r0 r0 1.4
+sbn HASH("StructureTurboVolumePump") HASH("purifier_tvp") On r0
+sbn HASH("StructurePressurantValve") HASH("purifier_press") On r0
+lbn r2 HASH("StructureLogicMemory") HASH("crafter_control") Setting Sum
+sbn HASH("StructureLogicMemory") HASH("crafter_control") Setting 0
+beqz r2 r12
+mod r0 r2 10
+sub r0 r0 5
+abs r0 r0
+div r2 r2 10
+trunc r2 r2
+mod r1 r2 10
+sub r1 r1 5
+abs r1 r1
+get r1 db r1
+div r2 r2 10
+trunc r2 r2
+beq r0 5 craft
+beq r0 4 clear
+beq r0 3 eject
+j r12
+craft:
+l r0 r1 RecipeHash
+sll r0 r0 8
+or r0 r0 r2
+sll r0 r0 8
+or r0 r0 2
+put r1 0 r0
+j r12
+clear:
+clrd r1
+j r12
+eject:
+sll r0 r2 8
+or r0 r0 7
+put r1 0 r0
+j r12
+waitForHot:
+l r0 habSensor Temperature
+blt r0 300.15 tickStart
+s coolingVent Mode 1
+s coolingVent On 1
+move r12 waitForPressure
+j tickStart
+waitForPressure:
+move r12 pressureDone
+j tickStart
+pressureDone:
+s coolingVent On 0
+move r12 waitForCold
+j tickStart
+waitForCold:
+l r0 coolingAnalyzer Temperature
+l r1 habSensor Temperature
+l r2 habSensor Pressure
+mul r0 10 r0
+mul r1 r2 r1
+add r0 r0 r1
+add r1 10 r2
+div r0 r0 r1
+blt r0 295.15 releaseCold
+j tickStart
+releaseCold:
+s coolingVent Mode 0
+s coolingVent On 1
+move r12 waitForVacuum
+j tickStart
+waitForVacuum:
+move r12 vacuumDone
+j tickStart
+vacuumDone:
+s coolingVent On 0
+move r12 waitForHot
+j tickStart

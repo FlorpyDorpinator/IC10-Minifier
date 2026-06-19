@@ -1,0 +1,135 @@
+lbn r9 2037291645 HASH("TrinityOS") ReferenceId 1
+lbn r11 2037291645 HASH("TrinityPolynomial") ReferenceId 1
+lbn r12 HASH("StructureLogicButton") HASH("Enter") ReferenceId 1
+lbn r13 HASH("StructureLogicButton") HASH("Reset") ReferenceId 1
+lb r7 HASH("StructureSatelliteDish") ReferenceId Minimum
+lb r8 HASH("StructureLargeSatelliteDish") ReferenceId Minimum
+s r7 On 1
+ResetDish:
+put db 12 0
+put r11 13 0
+s r7 Horizontal 0
+s r7 Vertical 0
+s r7 Setting 500
+s r7 BestContactFilter -1
+move r3 0
+move r4 0
+jal DishMovementYield
+put r7 0 TraderInstruction.WriteTraderData
+yield
+s r7 On 0
+s r8 On 0
+WaitForInit:
+l r0 r12 Activate
+beq r0 0 WaitForInit
+put r9 511 6
+yield
+WaitForInit2:
+l r0 r12 Activate
+beq r0 0 WaitForInit2
+put r9 511 7
+s r7 On 1
+s r8 On 1
+StartSpiralScan:
+yield
+jal ResetCheck
+s r7 Horizontal r3
+s r7 Vertical r4
+s r8 Horizontal r3
+s r8 Vertical r4
+jal UpdateCurrentStrongestSignal
+move r0 100
+jal IterateShuttleType
+jal IterateShuttleType
+jal IterateShuttleType
+add r3 0.9 r3
+add r4 0.055 r4
+blt r4 90 StartSpiralScan
+j ResetDish
+InitThreeShotProcedure:
+l r0 r7 SignalID
+s r7 BestContactFilter r0
+s r8 BestContactFilter r0
+put r9 511 8
+s r7 Setting 7500
+add r3 r3 1
+s r7 Horizontal r3
+jal DishMovementYield
+jal WaitForResolve
+jal DataGatherThreeShot
+add r3 r3 20
+add r4 r4 2.5
+min r4 r4 90
+s r7 Horizontal r3
+s r7 Vertical r4
+jal DishMovementYield
+jal WaitForResolve
+jal DataGatherThreeShot
+sub r3 r3 10
+sub r4 r4 5
+max r4 r4 0
+s r7 Horizontal r3
+s r7 Vertical r4
+jal DishMovementYield
+jal WaitForResolve
+jal DataGatherThreeShot
+SetTrueTraderLocation:
+put r9 511 10
+get r0 db 12
+beqz r0 SetTrueTraderLocation
+put db 12 0
+get r5 db 43
+get r6 db 44
+yield
+s r7 Horizontal r5
+s r7 Vertical r6
+s r8 Horizontal r5
+s r8 Vertical r6
+put r9 511 11
+put db 12 0
+yield
+get r0 db 12
+breqz r0 -2
+j ResetDish
+UpdateCurrentStrongestSignal:
+put r7 0 TraderInstruction.WriteTraderData
+get r0 r7 1
+srl r2 r0 8
+and r2 $FF r2
+get r0 r7 2
+srl r0 r0 8
+and r0 $FFFF r0
+add r2 r0 r2
+j ra
+DishMovementYield:
+yield
+l r0 r7 Idle
+beqz r0 DishMovementYield
+j ra
+DataGatherThreeShot:
+put r9 511 9
+l r0 r7 SignalStrength
+put r11 6 r0
+l r0 r7 Vertical
+put r11 0 r0
+l r0 r7 Horizontal
+put r11 5 r0
+put r11 14 1
+j ra
+WaitForResolve:
+move r14 ra
+yield
+jal ResetCheck
+l r0 r7 SignalStrength
+brltz r0 -3
+j r14
+ResetCheck:
+l r0 r13 Activate
+beqz r0 ra
+put r9 511 0
+j ResetDish
+IterateShuttleType:
+get r1 db r0
+beq r2 r1 InitThreeShotProcedure
+add r0 r0 1
+j ra

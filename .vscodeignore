@@ -4,3 +4,12 @@
 .git/**
 .github/**
 .vscode/**
+.claude/**
+.gitignore
+
+# Dev/test material that should never ship to the Marketplace
+Testing/**
+.specstory/**
+data/**
+*.ic10
+ItemIntegratedCircuit10-resources.assets-6831.png

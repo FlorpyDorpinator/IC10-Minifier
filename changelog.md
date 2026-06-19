@@ -2,6 +2,16 @@
 
 All notable changes to the IC10 Safe Minifier extension will be documented in this file.
 
+## [1.1.2] - 2026-06-18
+
+### Changed
+- Slimmed the published package: excluded dev/test material (`Testing/`, `.specstory/`, unused `data/`, and a stray root image) from the VSIX via `.vscodeignore`. No functional changes from 1.1.1.
+
+## [1.1.1] - 2026-06-18
+
+### Fixed (CRITICAL)
+- **CRITICAL BUG FIX**: Labels referenced only by non-branch instructions (e.g. `move coolingState waitForHot`) were treated as unused and their definitions were stripped during minification, leaving references pointing at deleted labels and producing broken output. A label is a line-number constant in IC10 and can be an operand of *any* instruction, not just branch/jump ops. Both "Safe Minify" and "Convert Labels to Line Numbers" now recognize a label used as any operand, so such labels are preserved (minify) and correctly resolved to line numbers (convert).
+
 ## [1.1.0] - 2026-01-03
 
 ### Fixed (CRITICAL)
